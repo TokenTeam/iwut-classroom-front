@@ -5,21 +5,21 @@
       <t-dropdown-item
         :options="schoolOptions"
         v-model="selectedSchool"
-        @change="handleSelectionChange"
+        @update:model-value="handleSelectionChange"
       />
 
       <!-- 时间选择 -->
       <t-dropdown-item
         :options="productOptions"
         v-model="selectedProduct"
-        @change="handleSelectionChange"
+        @update:model-value="handleSelectionChange"
       />
 
       <!-- 节数筛选 -->
       <t-dropdown-item
         :options="sorterOptions"
         v-model="selectedSorter"
-        @change="handleSelectionChange"
+        @update:model-value="handleSelectionChange"
       />
     </t-dropdown-menu>
   </div>
