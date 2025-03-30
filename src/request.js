@@ -67,6 +67,7 @@ export const getClassroomsData = createRequest(url);
 export const fetchAllData = async () => {
   try {
     // 实时获取最新 store 值
+    const store = useSelectionStore();
     const currentParams = {
       campus_code: store.campus,
       start_time: Number(store.time),
