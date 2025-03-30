@@ -105,6 +105,10 @@ const router = createRouter({
                                 }
                             }]
                         },
+                        {
+                            path: '/redirect/:path(.*)',
+                            component: () => import('@/views/RedirectView.vue')
+                        },
 
                     ]
                 }
