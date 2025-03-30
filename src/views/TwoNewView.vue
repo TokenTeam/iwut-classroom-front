@@ -111,3 +111,69 @@ const refreshCurrent = () => {
 // 暴露方法给子组件
 defineExpose({ refreshCurrent });
 </script>
+<style scoped>
+/* 新增样式 */
+.two-new-container {
+  position: relative;
+  width: 100%;
+  overflow-x: hidden; /* 隐藏横向滚动条 */
+
+}
+
+.fixed-sidebar {
+  display: flex;
+  width: 95%;
+  margin: 0 2.5%; /* 左右各留2.5%空隙 */
+  transform: translateZ(0); /* 触发硬件加速 */
+}
+
+/* 深度选择器覆盖组件库默认样式 */
+:deep(.t-side-bar) {
+  display: flex !important;
+  flex-direction: row !important;
+  width: 100%;
+  gap: 0 !important; /* 消除项间距 */
+}
+
+:deep(.t-side-bar-item) {
+  /* 基础居中设置 */
+  display: flex !important;
+  justify-content: center;
+  align-items: center;
+
+  /* 确保内容区域占满 */
+  width: 100%;
+
+  /* 重置可能影响布局的样式 */
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 隐藏滚动条（根据浏览器兼容性选择） */
+:deep(::-webkit-scrollbar) {
+  display: none;
+}
+
+:deep(.t-side-bar) {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+/* 针对文本容器的深度选择器 */
+:deep(.t-side-bar-item__text) {
+  display: block;
+  width: 100%;
+  text-align: center;
+
+  /* 处理长文本 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 如果存在图标容器 */
+:deep(.t-side-bar-item__icon) {
+  display: none !important; /* 如果不需要图标 */
+  /* 或 */
+  margin-right: 0 !important; /* 如果需要保留图标 */
+}
+</style>
