@@ -1,46 +1,57 @@
 <!-- TwoNewView.vue 二级子路由组件 -->
 <template>
   <div class="two-new-container">
-    <t-side-bar
-      :value="activeIndex"
-      @change="handleRouteChange"
-      class="fixed-sidebar"
-    >
-      <t-side-bar-item
-        v-for="(item, index) in navItems"
-        :key="index"
-        :value="index"
-        :label="item.label"
-        :badge-props="getBadgeStatus(item.path)"
-      />
-    </t-side-bar>
+    <!--    <t-side-bar-->
+    <!--      :value="activeIndex"-->
+    <!--      @change="handleRouteChange"-->
+    <!--      class="fixed-sidebar"-->
+    <!--    >-->
+    <!--&lt;!&ndash;      <t-side-bar-item&ndash;&gt;-->
+    <!--&lt;!&ndash;        v-for="(item, index) in navItems"&ndash;&gt;-->
+    <!--&lt;!&ndash;        :key="index"&ndash;&gt;-->
+    <!--&lt;!&ndash;        :value="index"&ndash;&gt;-->
+    <!--&lt;!&ndash;        :label="item.label"&ndash;&gt;-->
+    <!--&lt;!&ndash;        :badge-props="getBadgeStatus(item.path)"&ndash;&gt;-->
+    <!--&lt;!&ndash;        style=" >* {margin: 0;}"&ndash;&gt;-->
+    <!--&lt;!&ndash;      />&ndash;&gt;-->
 
-    <router-view v-slot="{ Component }">
-      <keep-alive :include="cachedViews">
-        <component :is="Component" :key="$route.fullPath"/>
-      </keep-alive>
-    </router-view>
+    <!--    </t-side-bar>-->
+    <div style="display: flex; justify-content: space-around; background-color: #f3f3f3;margin: 0;">
+      <div v-for="(item,index) in navItems"
+           :style="'flex:' + 1/navItems + ';display:inline-block;height: 60px; font-size:17px; line-height: 60px;'"
+           @click="handleRouteChange(index + 1)"
+      >
+        {{ item.label }}
+      </div>
+    </div>
+    <!--    <router-view v-slot="{ Component }">-->
+    <!--      <keep-alive :include="cachedViews">-->
+    <!--        <component :is="Component" :key="$route.fullPath"/>-->
+    <!--      </keep-alive>-->
+    <!--    </router-view>-->
+    <RoomView v-if="currentFloor !== -1" :current-floor-index="currentFloor"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref  } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { fetchAllData } from '@/request'
-import { useSelectionStore } from '@/stores/selectionStore'
+import {computed, ref} from 'vue';
+import {useRoute, useRouter} from 'vue-router';
+import {fetchAllData} from '@/request'
+import {useSelectionStore} from '@/stores/selectionStore'
+import RoomView from "@/views/RoomView.vue";
 
 
 const router = useRouter();
 const route = useRoute();
 const store = useSelectionStore();
-
+const currentFloor = ref(-1);
 // 导航项配置
 const navItems = ref([
-  { path: '/newworld/one', label: '一楼', refreshCount: 0 },
-  { path: '/newworld/two', label: '二楼', refreshCount: 0 },
-  { path: '/newworld/three', label: '三楼', refreshCount: 0 },
-  { path: '/newworld/four', label: '四楼', refreshCount: 0 },
-  { path: '/newworld/five', label: '五楼', refreshCount: 0 },
+  {path: '/newworld/one', label: '一楼', refreshCount: 0},
+  {path: '/newworld/two', label: '二楼', refreshCount: 0},
+  {path: '/newworld/three', label: '三楼', refreshCount: 0},
+  {path: '/newworld/four', label: '四楼', refreshCount: 0},
+  {path: '/newworld/five', label: '五楼', refreshCount: 0},
 ]);
 
 // 状态管理
@@ -55,40 +66,45 @@ const activeIndex = computed(() => {
 });
 // 修改后的 handleRouteChange 方法
 const handleRouteChange = (index: number) => { // 移除 async
-  // 原有的事件派发逻辑
-  window.dispatchEvent(new CustomEvent('side-bar-item-click', {
-    detail: {
-      index: index,
-      path: navItems.value[index].path
-    }
-  }));
+                                               // 原有的事件派发逻辑
+                                               // window.dispatchEvent(new CustomEvent('side-bar-item-click', {
+                                               //   detail: {
+                                               //     index: index,
+                                               //     path: navItems.value[index].path
+                                               //   }
+                                               // }));
 
   // 路由跳转逻辑
-  const targetPath = navItems.value[index].path;
-  if (route.path !== targetPath) {
-    router.push(targetPath);
-  }
-
+  // const targetPath = navItems.value[index].path;
+  // if (route.path !== targetPath) {
+  //   router.push(targetPath);
+  // }
+  store.isLoading = true;
+  currentFloor.value = index;
   // 使用 fetchAllData 获取数据
+  console.log()
+  store.time = isNaN(store.time) ? '1' : store.time;
+  store.section = isNaN(store.section) ? '13' : store.section;
   fetchAllData()
-    .then(data => {
-      console.log('完整建筑教室数据:', data);
-      // 将数据存储到 Pinia Store
-      store.setAvailableBuildings(Object.keys(data)); // 存储建筑列表
-      store.setClassroomData(data); // 存储完整数据
-    })
-    .catch(error => {
-      console.error('数据请求失败:', error.message);
-      errorMessage.value = '数据加载失败，请稍后重试';
-    });
+      .then(data => {
+        console.log('完整建筑教室数据:', data);
+        // 将数据存储到 Pinia Store
+        store.setAvailableBuildings(Object.keys(data)); // 存储建筑列表
+        store.setClassroomData(data); // 存储完整数据
+        store.isLoading = false;
+      })
+      .catch(error => {
+        console.error('数据请求失败:', error.message);
+        errorMessage.value = '数据加载失败，请稍后重试';
+      });
 };
 
 // 徽章状态显示刷新次数
 const getBadgeStatus = (path: string) => {
   const item = navItems.value.find(i => i.path === path);
   return item && item.refreshCount > 0
-    ? { count: item.refreshCount, color: 'var(--td-brand-color)' }
-    : null;
+      ? {count: item.refreshCount, color: 'var(--td-brand-color)'}
+      : null;
 };
 
 // 缓存视图列表
@@ -104,12 +120,12 @@ const refreshCurrent = () => {
     cachedViews.value = cachedViews.value.filter(v => v !== route.name);
     router.replace({
       path: '/redirect' + route.fullPath,
-      query: { _t: Date.now() }
+      query: {_t: Date.now()}
     });
   }
 };
 // 暴露方法给子组件
-defineExpose({ refreshCurrent });
+defineExpose({refreshCurrent});
 </script>
 <style scoped>
 /* 新增样式 */
@@ -158,6 +174,7 @@ defineExpose({ refreshCurrent });
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
 }
+
 /* 针对文本容器的深度选择器 */
 :deep(.t-side-bar-item__text) {
   display: block;

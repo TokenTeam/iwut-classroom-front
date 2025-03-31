@@ -50,7 +50,7 @@ export default defineConfig({
   ,server: {
     proxy: {
       '/api': {
-        target: 'http://cl2.hno3.cn',
+        target: 'https://classroom.iwut-api.heavensdoor.cn/api',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }

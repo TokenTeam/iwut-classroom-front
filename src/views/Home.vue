@@ -1,12 +1,39 @@
 <script setup>
 import {RouterLink} from "vue-router";
+import {ref} from "vue";
+// const myObject = [
+//   "学习是开启梦想之门的钥匙，握紧它，勇敢地去追求你的理想。",
+//   "在知识的花园里，辛勤耕耘，终将收获满园芬芳。",
+//   "学习是自我投资的最佳方式，它的回报将伴随你一生。"
+// ]
 
-const myObject = [
-  "学习是开启梦想之门的钥匙，握紧它，勇敢地去追求你的理想。",
-  "在知识的花园里，辛勤耕耘，终将收获满园芬芳。",
-  "学习是自我投资的最佳方式，它的回报将伴随你一生。"
-]
-const randomInt = Math.floor(Math.random() * 3);
+// const randomInt = Math.floor(Math.random() * 3);
+const content = ref('');
+const author = ref('');
+// fetch("https://v1.hitokoto.cn/?c=d&c=i&c=k")
+//     .then(response => response.json())
+//     .then(data => {
+//       console.log(data);
+//       content.value = data.hitokoto;
+//       author.value = data.from;
+//     })
+//     .catch(error => {
+//       console.error('Error:', error);
+//     });
+
+async function hitokoto() {
+  try {
+    const response = await fetch('https://v1.hitokoto.cn?c=d&c=i&c=k');
+    const data = await response.json();
+    const hitokoto = document.querySelector('#hitokoto');
+    hitokoto.innerText = data.from_who
+        ? `${data.hitokoto}——${data.from_who}「${data.from}」`
+        : `${data.hitokoto}——「${data.from}」`;
+  } catch (error) {
+    console.error(error);
+  }
+}
+hitokoto();
 </script>
 
 <template>
@@ -18,12 +45,13 @@ const randomInt = Math.floor(Math.random() * 3);
 
     <!-- 文本输入区域 -->
     <div class="text-input">
-      {{ myObject[randomInt] }}
+    <span id="hitokoto"></span>
+<!--      {{ myObject[randomInt] }}-->
     </div>
 
     <!-- 按钮区域 -->
     <nav>
-      <RouterLink to="/newworld">开始自习</RouterLink>
+      <RouterLink to="/classroom" >开始自习</RouterLink>
     </nav>
   </div>
 </template>
