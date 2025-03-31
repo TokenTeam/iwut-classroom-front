@@ -1,6 +1,6 @@
 <template>
   <div class="Front-View">
-    <t-dropdown-menu>
+    <t-dropdown-menu style="width: 100%;">
       <!-- 校区选择 -->
       <t-dropdown-item
         :options="schoolOptions"
@@ -74,7 +74,7 @@ const sorterOptions = [
   { value: '13', label: '13小节' },
 ];
 // 在 Vue 组件中
-import { useSelectionStore } from '../stores/selectionStore.js'
+import { useSelectionStore } from '@/stores/selectionStore'
 
 const store = useSelectionStore()
 

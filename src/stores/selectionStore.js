@@ -6,7 +6,8 @@ export const useSelectionStore = defineStore('selections', {
     time: '1',
     section: '13',
     availableBuildings: [],
-    classroomData: {}
+    classroomData: {},
+    isLoading: true
   }),
   actions: {
     updateSelections(payload) {

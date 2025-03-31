@@ -1,16 +1,16 @@
 <script setup>
-import NewFind from "@/views/Home.vue";
+import {ref} from "vue";
+
 </script>
 <template>
   <Suspense>
     <template #default>
-      <NewFind v-if="toggleNewFind"/>
+      <RouterView />
     </template>
     <template #fallback>
       <div>组件加载中...</div>
     </template>
   </Suspense>
-  <router-view />
 </template>
 <style scoped>
 nav {

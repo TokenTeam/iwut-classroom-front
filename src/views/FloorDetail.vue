@@ -1,20 +1,20 @@
 <!-- FloorDetail.vue 最终优化版 -->
 <template>
   <div class="floor-detail">
-    <t-loading :loading="isLoading">
+    <t-loading :loading="isLoading"/>
       <div
-        v-for="(rooms, buildingCode) in store.classroomData"
-        :key="buildingCode"
-        class="building-section"
+          v-for="(rooms, buildingCode) in store.classroomData"
+          :key="buildingCode"
+          class="building-section"
       >
         <!-- 显示建筑名称 -->
         {{ getBuildingName(buildingCode) }}
 
         <div class="room-list">
           <div
-            v-for="room in filterRoomsByFloor(rooms)"
-            :key="`${buildingCode}-${room}`"
-            class="room-item"
+              v-for="room in filterRoomsByFloor(rooms)"
+              :key="`${buildingCode}-${room}`"
+              class="room-item"
           >
             {{ room }}
           </div>
@@ -24,25 +24,32 @@
           </div>
         </div>
       </div>
-    </t-loading>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-import { useSelectionStore } from '@/stores/selectionStore'
+import {computed} from 'vue'
+import {useRoute} from 'vue-router'
+import {useSelectionStore} from '@/stores/selectionStore'
+import {storeToRefs} from "pinia";
 
 const route = useRoute()
 const store = useSelectionStore()
 
 // 楼层映射配置
+// const floorConfig = {
+//   one: { number: 1, label: '一楼' },
+//   two: { number: 2, label: '二樓' },
+//   three: { number: 3, label: '三樓' },
+//   four: { number: 4, label: '四樓' },
+//   five: { number: 5, label: '五樓' }
+// }
 const floorConfig = {
-  one: { number: 1, label: '一楼' },
-  two: { number: 2, label: '二樓' },
-  three: { number: 3, label: '三樓' },
-  four: { number: 4, label: '四樓' },
-  five: { number: 5, label: '五樓' }
+  1: {number: 1, label: '一楼'},
+  2: {number: 2, label: '二樓'},
+  3: {number: 3, label: '三樓'},
+  4: {number: 4, label: '四樓'},
+  5: {number: 5, label: '五樓'}
 }
 // 建筑名称映射表
 const buildingNameMap: Record<string, string> = {
@@ -67,14 +74,16 @@ const getBuildingName = (code: string) => {
   return buildingNameMap[code] || `未知建筑（${code}）`
 }
 // 获取当前楼层信息
-const currentFloor = computed(() => {
-  const pathSegments = route.path.split('/')
-  const floorKey = pathSegments[pathSegments.length - 1] as keyof typeof floorConfig
-  return floorConfig[floorKey] || { number: 0, label: '未知楼层' }
-})
+// const currentFloor = computed(() => {
+//   const pathSegments = route.path.split('/')
+//   const floorKey = pathSegments[pathSegments.length - 1] as keyof typeof floorConfig
+//   return floorConfig[floorKey] || { number: 0, label: '未知楼层' }
+// })
+const props = defineProps(["currentFloorIndex"]);
+const currentFloor = computed(() => floorConfig[props.currentFloorIndex] || {number: 0, label: '未知楼层'})
 
 // 显示标签
-const currentFloorLabel = computed(() => currentFloor.value.label)
+// const currentFloorLabel = computed(() => currentFloor.value.label)
 
 // 教室筛选逻辑
 const filterRoomsByFloor = (rooms: string[]) => {
@@ -85,7 +94,7 @@ const filterRoomsByFloor = (rooms: string[]) => {
   })
 }
 
-const isLoading = computed(() => store.isLoading)
+const {isLoading} =storeToRefs(store);
 </script>
 
 <style scoped>
@@ -94,7 +103,8 @@ const isLoading = computed(() => store.isLoading)
   padding: 16px;
   background: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 112px;
 }
 
 h3 {
