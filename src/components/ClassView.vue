@@ -37,26 +37,11 @@ const totalClassrooms = computed(() =>
     buildings.value.reduce((total: number, building: Building) => total + building.count, 0)
 );
 
-// 折叠状态
-const expandedBuildings = ref<{ [key: string]: boolean }>({})
-
-// 初始化折叠状态
-const initializeExpandedState = () => {
-  buildings.value.forEach((building: Building, index: number) => {
-    expandedBuildings.value[building.name] = index === 0;
-  });
-}
-
-const toggleBuilding = (buildingName: string) => {
-  expandedBuildings.value[buildingName] = !expandedBuildings.value[buildingName]
-}
-
 // 监听和副作用
 watch(totalClassrooms, (newTotal: number) => {
   store.setTotalClassrooms(newTotal);
 }, {immediate: true});
 
-watch(buildings, initializeExpandedState, {immediate: true});
 
 // 组件挂载时获取数据
 onMounted(async () => {
@@ -64,7 +49,14 @@ onMounted(async () => {
     await fetchAllClassroomData();
   }
 });
-const openingCards = ref<Array<string | number>>([1]);
+const openingCards = ref<Array<string | number>>([0]);
+// 初始化折叠状态
+const initializeExpandedState = () => {
+  openingCards.value = [0];
+}
+defineExpose({initializeExpandedState});
+watch(buildings, initializeExpandedState, {immediate: true});
+
 const handleChange = (val: CollapseValue) => {
   openingCards.value = val;
 };

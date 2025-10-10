@@ -54,7 +54,7 @@ const createApiRequest = (endpoint: string) => async (params: RequestParams): Pr
 
   const headers: HeadersInit = {
     "accept": "application/json",
-};
+  };
 
   try {
     const response = await fetch(url, {

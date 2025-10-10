@@ -55,6 +55,7 @@ const handleCampusSelect = (campusValue: string) => {
 
 const handleComplete = () => {
   store.updateSelectedCampuses([selectedCampus.value])
+  fetchAllClassroomData();
   close()
 }
 
@@ -128,7 +129,7 @@ function close() {
     </div>
     <t-calendar
         v-model:visible="showCalendar"
-        :value="store.selectedDate"
+        :value="new Date(store.selectedDate)"
         @confirm="handleDateConfirm"
     />
 

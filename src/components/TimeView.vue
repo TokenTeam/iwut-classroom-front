@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useSelectionStore } from '../stores/selectionStore'
 
-const router = useRouter()
 const store = useSelectionStore()
 
 interface CampusOptions {
