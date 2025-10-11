@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useSelectionStore } from '../stores/selectionStore.ts'
-import { fetchAllClassroomData } from "@/request.ts";
+import { loadClassroomData } from "@/request.ts";
 
 const store = useSelectionStore()
 
@@ -34,8 +34,8 @@ const resetFilters = () => {
   selectedCampus.value = '0202'
   store.updateSelectedCampuses([selectedCampus.value])
 
-  setTimeout(() => {
-    fetchAllClassroomData();
+  setTimeout(async () => {
+    await loadClassroomData();
   }, 100);
 }
 
@@ -53,10 +53,10 @@ const handleCampusSelect = (campusValue: string) => {
   selectedCampus.value = campusValue
 }
 
-const handleComplete = () => {
+const handleComplete = async () => {
   store.updateSelectedCampuses([selectedCampus.value])
-  fetchAllClassroomData();
   close()
+  await loadClassroomData();
 }
 
 onMounted(() => {

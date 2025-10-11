@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {ref, computed, watch, onMounted} from "vue";
 import {useSelectionStore} from '../stores/selectionStore';
-import {fetchAllClassroomData} from '../request';
+import {loadClassroomData} from '../request';
 import type {CollapseValue} from "tdesign-mobile-vue";
 
 const store = useSelectionStore();
@@ -46,7 +46,7 @@ watch(totalClassrooms, (newTotal: number) => {
 // 组件挂载时获取数据
 onMounted(async () => {
   if (Object.keys(store.classroomData).length === 0) {
-    await fetchAllClassroomData();
+    await loadClassroomData();
   }
 });
 const openingCards = ref<Array<string | number>>([0]);

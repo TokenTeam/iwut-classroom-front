@@ -20,7 +20,7 @@ function resetTimeView() {
     </div>
     <t-popup v-model="showPopup" placement="bottom" destroy-on-close class="h-5/6" :z-index="1000"
              @close="resetTimeView">
-      <ChooseView @close="showPopup = false"/>
+      <ChooseView @close="()=>{showPopup = false; resetTimeView();}"/>
     </t-popup>
   </div>
 </template>
