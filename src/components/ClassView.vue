@@ -3,6 +3,7 @@ import {ref, computed, watch, onMounted} from "vue";
 import {useSelectionStore} from '../stores/selectionStore';
 import {loadClassroomData} from '../request';
 import type {CollapseValue} from "tdesign-mobile-vue";
+import {storeToRefs} from "pinia";
 
 const store = useSelectionStore();
 
@@ -32,6 +33,8 @@ const buildings = computed<Building[]>(() => {
     floors: data.floors || []
   }));
 });
+
+const {isLoading} = storeToRefs(store);
 
 const totalClassrooms = computed(() =>
     buildings.value.reduce((total: number, building: Building) => total + building.count, 0)
@@ -69,7 +72,10 @@ const handleChange = (val: CollapseValue) => {
     </div>
     <div v-else>
       <t-collapse theme="card" :value="openingCards" @change="handleChange">
-        <t-collapse-panel v-for="(building,index) of buildings" :key="building.name" :value="index">
+        <div v-if="isLoading" class="flex items-center justify-center">
+          <t-loading text="加载中..." class="min-h-24"/>
+        </div>
+        <t-collapse-panel v-else v-for="(building,index) of buildings" :key="building.name" :value="index">
           <template #header>
             <h3 class="text-base leading-6 font-semibold text-gray-900">
               {{ building.name }}<span class="text-sm font-normal text-gray-500">（{{ building.count }}）</span>

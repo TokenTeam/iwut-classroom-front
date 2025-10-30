@@ -33,7 +33,7 @@ export const useSelectionStore = defineStore('selections', () => {
   const section = ref<number>(2) // 改为 number 类型
   const availableBuildings = ref<string[]>([])
   const classroomData = ref<ClassroomData>({})
-  const isLoading = ref<boolean>(false)
+  const isLoading = ref<boolean>(true)
 
   const selectedDate = ref<string>(new Date().toISOString().split('T')[0])
   const selectedDateDisplay = ref<string>(formatDateDisplay(new Date()))
