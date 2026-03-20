@@ -51,7 +51,16 @@ type buildingClassroom = {
   count: number;
   floors: floorClassroom[];
 }
-const baseURL = import.meta.env.VITE_OSS_URL;
+const baseURL = (import.meta.env.VITE_OSS_URL ?? '') as string;
+
+/** 合并后的 JSON：/{campus}/{周一键}.json，避免按楼栋拆分导致请求数过多 */
+function classroomBundleUrl(campus: string, mondayKey: string): string {
+  const path = `${campus}/${mondayKey}.json`;
+  if (baseURL === '/' || baseURL === '') return `/${path}`;
+  const trimmed = baseURL.replace(/\/$/, '');
+  return `${trimmed}/${path}`;
+}
+
 export async function loadClassroomData(): Promise<void> {
   const store = useSelectionStore();
   store.setLoading(true);
@@ -60,44 +69,59 @@ export async function loadClassroomData(): Promise<void> {
   const date = getFirstDayOfWeek(targetDate);
   const ans = new Map<string, buildingClassroom>();
   let count = 0;
-  for (const building of campusBuildingMap[campus] || []) {
-    const url = baseURL + `/${campus}/${building}/${date}.json`;
-    try {
-      const response = await fetch(url);
-      if (!response.ok)
-        throw new Error('网络请求失败，url: ' + url);
-      const data = await response.json();
-      let st = new Set<string>(data[getDayOfWeek(targetDate)][Number(store.time)]);
-      for(let i = Number(store.time) + 1; i <= Number(store.section); i++) {
-        const currentSet = new Set<string>(data[getDayOfWeek(targetDate)][i]);
-        st = new Set([...st].filter(x => currentSet.has(x)));
-      }
-      const tempAns = {
-        code: building,
-        count: st.size,
-        floors: [] as floorClassroom[]
-      } as buildingClassroom;
-      const floors = new Map<string, string[]>();
-      for (const room of Array.from(st).sort()) {
-        const floorNumber = room.charAt(0);
-        const floorName = `${floorNumber}楼`;
-        if(!floors.has(floorName)) {
-          floors.set(floorName, []);
-        }
-        floors.get(floorName)!.push(room);
-      }
-      for (const [name, rooms] of floors) {
-        tempAns.floors.push({name, rooms});
-      }
-      tempAns.floors.sort((a, b) => a.name.localeCompare(b.name));
-      tempAns.floors.map(x => x.rooms.sort())
-      ans.set(buildingNameMap[building] || building, tempAns);
-      count += st.size;
-    } catch (error) {
-      console.log(`获取建筑 ${building} 的教室数据失败:`, error);
-    }
+  const dow = getDayOfWeek(targetDate);
+  const t0 = Number(store.time);
+  const t1 = Number(store.section);
+
+  const url = classroomBundleUrl(campus, date);
+  let bundle: Record<string, Record<number, Record<number, string[]>>> = {};
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('网络请求失败，url: ' + url);
+    bundle = await response.json();
+  } catch (error) {
+    console.error(`获取校区 ${campus} 课表数据失败:`, error);
   }
-  console.log(Object.fromEntries(ans));
+
+  for (const building of campusBuildingMap[campus] || []) {
+    const data = bundle[building];
+    if (!data || !data[dow]) {
+      ans.set(buildingNameMap[building] || building, {
+        code: building,
+        count: 0,
+        floors: []
+      });
+      continue;
+    }
+    const daySlots = data[dow];
+    let st = new Set<string>(daySlots[t0] || []);
+    for (let i = t0 + 1; i <= t1; i++) {
+      const currentSet = new Set<string>(daySlots[i] || []);
+      st = new Set([...st].filter((x) => currentSet.has(x)));
+    }
+    const tempAns = {
+      code: building,
+      count: st.size,
+      floors: [] as floorClassroom[]
+    } as buildingClassroom;
+    const floors = new Map<string, string[]>();
+    for (const room of Array.from(st).sort()) {
+      const floorNumber = room.charAt(0);
+      const floorName = `${floorNumber}楼`;
+      if (!floors.has(floorName)) {
+        floors.set(floorName, []);
+      }
+      floors.get(floorName)!.push(room);
+    }
+    for (const [name, rooms] of floors) {
+      tempAns.floors.push({ name, rooms });
+    }
+    tempAns.floors.sort((a, b) => a.name.localeCompare(b.name));
+    tempAns.floors.forEach((x) => x.rooms.sort());
+    ans.set(buildingNameMap[building] || building, tempAns);
+    count += st.size;
+  }
+
   store.setClassroomData(Object.fromEntries(ans));
   store.setTotalClassrooms(count);
   store.setLoading(false);
