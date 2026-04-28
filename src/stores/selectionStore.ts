@@ -14,9 +14,11 @@ interface UpdateSelectionsPayload {
 const timeMap: Record<string, { start: number; end: number }> = {
   '8:00 - 9:35': { start: 1, end: 2 },
   '9:55 - 12:20': { start: 3, end: 5 },
-  '14:00 - 16:25': { start: 6, end: 8 },
-  '16:45 - 18:20': { start: 9, end: 10 },
-  '19:00 - 21:25': { start: 11, end: 13 }
+  '12:25 - 13:50': { start: 6, end: 7 },
+  '14:00 - 16:25': { start: 8, end: 10 },
+  '16:45 - 18:20': { start: 11, end: 12 },
+  '18:20 - 18:55': { start: 13, end: 13 },
+  '19:00 - 21:25': { start: 14, end: 16 }
 }
 
 const formatDateDisplay = (date: Date): string => {

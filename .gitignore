@@ -28,3 +28,6 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+data_process
+public
+

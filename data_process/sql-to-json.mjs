@@ -2,7 +2,7 @@
  * 将 empty_classrooms 的 INSERT 导出转为前端可用的按「校区 + 日历周（周一键）」合并的 JSON。
  *
  * 默认：第一教学周周一 = 2026-02-23（可通过 --term=YYYY-MM-DD 覆盖）。
- * 输出：{ [buildingCode]: { [dayOfWeek1-7]: { [classNum1-13]: string[] } } } }
+ * 输出：{ [buildingCode]: { [dayOfWeek1-7]: { [classNum1-16]: string[] } } } }
  *
  * 用法：node data_process/sql-to-json.mjs [--out=public] [--term=2026-02-23]
  */
@@ -55,7 +55,7 @@ function roomsToArray(raw) {
 
 function main() {
   const { dir: outRel, term } = parseArgs()
-  const sqlPath = path.join(__dirname, 'classroom_20260319.sql')
+  const sqlPath = path.join(__dirname, 'classroom.sql')
   const outRoot = path.resolve(ROOT, outRel)
   const termStart = parseTermStartMonday(term)
 

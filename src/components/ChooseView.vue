@@ -14,9 +14,11 @@ const selectedTime = computed(() => store.selectedTime)
 
 const timeOptions = [
   { value: '8:00 - 9:35', label: '8:00 - 9:35     1-2节' },
-  { value: '9:55 - 12:20', label: '9:55 - 12:20     3-5节' },
-  { value: '14:00 - 16:25', label: '14:00 - 16:25   6-8节' },
-  { value: '16:45 - 18:20', label: '16:45 - 18:20  9-10节' },
+  { value: '9:55 - 12:20', label: '9:55 - 12:20   3-5节' },
+  { value: '12:25 - 13:50', label: '12:25 - 13:50  中课' },
+  { value: '14:00 - 16:25', label: '14:00 - 16:25  6-8节' },
+  { value: '16:45 - 18:20', label: '16:45 - 18:20 9-10节' },
+  { value: '18:20 - 18:55', label: '18:20 - 18:55  晚课' },
   { value: '19:00 - 21:25', label: '19:00 - 21:25 11-13节' }
 ]
 
@@ -95,7 +97,7 @@ function close() {
             <t-button size="small" theme="primary" variant="outline" shape="round">选择时间</t-button>
           </div>
 
-          <div v-if="showTimeDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto">
+          <div v-if="showTimeDropdown" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-96 overflow-y-auto">
             <div v-for="option in timeOptions" :key="option.value"
                  class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors"
                  :class="selectedTime === option.value ? 'text-blue-500 bg-blue-50' : 'text-gray-900'"
