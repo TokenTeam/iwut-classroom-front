@@ -32,7 +32,8 @@ const campusOptions = [
 
 const resetFilters = () => {
   store.updateSelectedDate(new Date())
-  store.updateSelectedTime('8:00 - 9:35')
+  // store.updateSelectedTime('8:00 - 9:35') @note: 此处可以根据实际情况设置默认时间段 @lichx
+  store.syncSelectedTimeWithCurrentTime()
   selectedCampus.value = '0202'
   store.updateSelectedCampuses([selectedCampus.value])
 
