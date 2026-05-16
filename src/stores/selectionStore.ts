@@ -36,10 +36,24 @@ const getCurrentTimeSlotKey = (date: Date = new Date()): string => {
       startMinutes: parseMinutes(startText),
       endMinutes: parseMinutes(endText)
     }
-  })
+  }).sort((a, b) => a.startMinutes - b.startMinutes) // 确保按开始时间排序
 
-  const matchedSlot = orderedSlots.find((slot) => currentMinutes >= slot.startMinutes && currentMinutes <= slot.endMinutes)
-  return matchedSlot?.label || orderedSlots[orderedSlots.length - 1]?.label || '8:00 - 9:35'
+  // 1. 优先找包含当前时间的时间段
+  const currentSlot = orderedSlots.find(
+    (slot) => currentMinutes >= slot.startMinutes && currentMinutes <= slot.endMinutes
+  )
+  
+  if (currentSlot) return currentSlot.label
+
+  // 2. 找不到则找下一个即将开始的时间段（向后看）
+  const nextSlot = orderedSlots.find(
+    (slot) => currentMinutes < slot.startMinutes
+  )
+  
+  if (nextSlot) return nextSlot.label
+
+  // 3. 如果连下一个都没有（即当前时间晚于所有时间段），返回最后一个
+  return orderedSlots[orderedSlots.length - 1]?.label || '8:00 - 9:35'
 }
 
 const formatDateDisplay = (date: Date): string => {

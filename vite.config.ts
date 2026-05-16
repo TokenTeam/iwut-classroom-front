@@ -20,9 +20,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://classroom.iwut-api.heavensdoor.cn',
+        target: 'https://bucket.tokenteam.net',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/api')
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }
