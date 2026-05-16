@@ -21,6 +21,41 @@ const timeMap: Record<string, { start: number; end: number }> = {
   '19:00 - 21:25': { start: 14, end: 16 }
 }
 
+const getCurrentTimeSlotKey = (date: Date = new Date()): string => {
+  const currentMinutes = date.getHours() * 60 + date.getMinutes()
+
+  const parseMinutes = (timeText: string): number => {
+    const [hoursText, minutesText] = timeText.split(':')
+    return Number(hoursText) * 60 + Number(minutesText)
+  }
+
+  const orderedSlots = Object.keys(timeMap).map((label) => {
+    const [startText, endText] = label.split(' - ')
+    return {
+      label,
+      startMinutes: parseMinutes(startText),
+      endMinutes: parseMinutes(endText)
+    }
+  }).sort((a, b) => a.startMinutes - b.startMinutes) // 确保按开始时间排序
+
+  // 1. 优先找包含当前时间的时间段
+  const currentSlot = orderedSlots.find(
+    (slot) => currentMinutes >= slot.startMinutes && currentMinutes <= slot.endMinutes
+  )
+  
+  if (currentSlot) return currentSlot.label
+
+  // 2. 找不到则找下一个即将开始的时间段（向后看）
+  const nextSlot = orderedSlots.find(
+    (slot) => currentMinutes < slot.startMinutes
+  )
+  
+  if (nextSlot) return nextSlot.label
+
+  // 3. 如果连下一个都没有（即当前时间晚于所有时间段），返回最后一个
+  return orderedSlots[orderedSlots.length - 1]?.label || '8:00 - 9:35'
+}
+
 const formatDateDisplay = (date: Date): string => {
   const month = date.getMonth() + 1
   const day = date.getDate()
@@ -39,7 +74,7 @@ export const useSelectionStore = defineStore('selections', () => {
 
   const selectedDate = ref<string>(new Date().toISOString().split('T')[0])
   const selectedDateDisplay = ref<string>(formatDateDisplay(new Date()))
-  const selectedTime = ref<string>('8:00 - 9:35')
+  const selectedTime = ref<string>(getCurrentTimeSlotKey())
   const selectedCampuses = ref<string[]>(['0202'])
   const selectedBuildings = ref<string[]>(['博学主楼'])
   const totalClassrooms = ref<number>(0)
@@ -72,6 +107,10 @@ export const useSelectionStore = defineStore('selections', () => {
     updateTimeFromSelectedTime(timeValue)
   }
 
+  const syncSelectedTimeWithCurrentTime = (): void => {
+    updateSelectedTime(getCurrentTimeSlotKey())
+  }
+
   const updateSelectedCampuses = (campuses: string[]): void => {
     selectedCampuses.value = campuses
     campus.value = campuses[0] || '0202'
@@ -85,8 +124,6 @@ export const useSelectionStore = defineStore('selections', () => {
 
   const reset = (): void => {
     campus.value = '0202'
-    time.value = 1
-    section.value = 2
     availableBuildings.value = []
     classroomData.value = {}
     isLoading.value = false
@@ -94,10 +131,11 @@ export const useSelectionStore = defineStore('selections', () => {
     const today = new Date()
     selectedDate.value = today.toISOString().split('T')[0]
     selectedDateDisplay.value = formatDateDisplay(today)
-    selectedTime.value = '8:00 - 9:35'
     selectedCampuses.value = ['0202']
     selectedBuildings.value = ['博学主楼']
     totalClassrooms.value = 0
+
+    syncSelectedTimeWithCurrentTime()
   }
 
   const hasClassroomData = computed(() => Object.keys(classroomData.value).length > 0)
@@ -114,6 +152,7 @@ export const useSelectionStore = defineStore('selections', () => {
     updateSelections, updateSelectedDate, updateSelectedTime, updateSelectedCampuses,
     updateSelectedBuildings, setTotalClassrooms, setAvailableBuildings,
     setClassroomData, setLoading, reset,
+    syncSelectedTimeWithCurrentTime,
 
     hasClassroomData, totalBuildings
   }

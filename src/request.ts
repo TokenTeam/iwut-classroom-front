@@ -51,7 +51,8 @@ type buildingClassroom = {
   count: number;
   floors: floorClassroom[];
 }
-const baseURL = (import.meta.env.VITE_OSS_URL ?? '') as string;
+// const baseURL = (import.meta.env.VITE_OSS_URL ?? '') as string;
+const baseURL = ('/api/iwut/classroom/') as string;
 
 /** 合并后的 JSON：/{campus}/{周一键}.json，避免按楼栋拆分导致请求数过多 */
 function classroomBundleUrl(campus: string, mondayKey: string): string {
