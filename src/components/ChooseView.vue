@@ -77,11 +77,11 @@ function close() {
 
 <template>
   <div class="h-full bg-white flex flex-col">
-    <svg class="absolute top-[17px] right-[16px]" @click="close" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="asxclose"><path id="stroke1" d="M16.9503 7.05029L12.0005 12M12.0005 12L7.05078 16.9498M12.0005 12L16.9503 16.9498M12.0005 12L7.05078 7.05029" stroke-linecap="square" stroke-width="2" stroke="currentColor"/></g></svg>
-    <div class="p-4 flex justify-center text-lg leading-[26px] font-bold">全部筛选</div>
+    <svg class="absolute top-4.25 right-4" @click="close" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="asxclose"><path id="stroke1" d="M16.9503 7.05029L12.0005 12M12.0005 12L7.05078 16.9498M12.0005 12L16.9503 16.9498M12.0005 12L7.05078 7.05029" stroke-linecap="square" stroke-width="2" stroke="currentColor"/></g></svg>
+    <div class="p-4 flex justify-center text-lg leading-6.5 font-bold">全部筛选</div>
     <div class="flex-1 px-4">
       <div class="my-4">
-        <div class="text-sm leading-[22px] font-medium text-gray-900 mb-2">日期</div>
+        <div class="text-sm leading-5.5 font-medium text-gray-900 mb-2">日期</div>
         <div class="flex justify-between items-center cursor-pointer"
              @click="showCalendar = true">
           <div>{{ selectedDateDisplay }}</div>
@@ -90,7 +90,7 @@ function close() {
       </div>
       <hr class="border-neutral-200" />
       <div class="my-4">
-        <div class="text-sm leading-[22px] font-medium text-gray-900 mb-2">时间</div>
+        <div class="text-sm leading-5.5 font-medium text-gray-900 mb-2">时间</div>
         <div class="relative">
           <div class="flex justify-between items-center cursor-pointer"
                @click="showTimeDropdown = !showTimeDropdown">
@@ -110,7 +110,7 @@ function close() {
       </div>
       <hr class="border-neutral-200" />
       <div class="my-4">
-        <div class="text-sm leading-[22px] font-medium text-gray-900 mb-2">校区</div>
+        <div class="text-sm leading-5.5 font-medium text-gray-900 mb-2">校区</div>
         <div class="grid grid-cols-3 grid-rows-2 gap-3">
           <t-check-tag v-for="campus in campusOptions" :key="campus.value" :checked="campus.value === selectedCampus" shape="round" variant="light-outline"
                        size="large" class="w-full min-h-10 flex justify-center items-center" @click="handleCampusSelect(campus.value)">
