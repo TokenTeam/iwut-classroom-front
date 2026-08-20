@@ -56,7 +56,6 @@ const handleTimeSelect = (time: string) => {
 
 const handleCampusSelect = async (campusValue: string) => {
   selectedCampus.value = campusValue
-  await saveCampusToNativeRPC(campusValue)
 }
 
 const handleComplete = async () => {
