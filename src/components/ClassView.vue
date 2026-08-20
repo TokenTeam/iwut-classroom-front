@@ -4,6 +4,7 @@ import {useSelectionStore} from '../stores/selectionStore';
 import {loadClassroomData} from '../request';
 import type {CollapseValue} from "tdesign-mobile-vue";
 import {storeToRefs} from "pinia";
+import { initializeCampusFromNativeRPC } from "@/rpc.ts";
 
 const store = useSelectionStore();
 
@@ -48,6 +49,11 @@ watch(totalClassrooms, (newTotal: number) => {
 
 // 组件挂载时获取数据
 onMounted(async () => {
+  try {
+    await initializeCampusFromNativeRPC();
+  } catch (error) {
+    console.error('初始化校区失败，将使用默认校区:', error);
+  }
   if (Object.keys(store.classroomData).length === 0) {
     await loadClassroomData();
   }

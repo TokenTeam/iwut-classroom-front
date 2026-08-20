@@ -2,6 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useSelectionStore } from '../stores/selectionStore.ts'
 import { loadClassroomData } from "@/request.ts";
+import { saveCampusToNativeRPC } from "@/rpc.ts";
 
 const store = useSelectionStore()
 
@@ -30,12 +31,13 @@ const campusOptions = [
   { value: '0301', label: '余家头校区' }
 ]
 
-const resetFilters = () => {
+const resetFilters = async () => {
   store.updateSelectedDate(new Date())
   // store.updateSelectedTime('8:00 - 9:35') @note: 此处可以根据实际情况设置默认时间段 @lichx
   store.syncSelectedTimeWithCurrentTime()
   selectedCampus.value = '0202'
   store.updateSelectedCampuses([selectedCampus.value])
+  await saveCampusToNativeRPC(selectedCampus.value)
 
   setTimeout(async () => {
     await loadClassroomData();
@@ -52,11 +54,13 @@ const handleTimeSelect = (time: string) => {
   showTimeDropdown.value = false
 }
 
-const handleCampusSelect = (campusValue: string) => {
+const handleCampusSelect = async (campusValue: string) => {
   selectedCampus.value = campusValue
+  await saveCampusToNativeRPC(campusValue)
 }
 
 const handleComplete = async () => {
+  await saveCampusToNativeRPC(selectedCampus.value)
   store.updateSelectedCampuses([selectedCampus.value])
   close()
   await loadClassroomData();
