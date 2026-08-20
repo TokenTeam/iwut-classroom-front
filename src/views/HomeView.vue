@@ -14,8 +14,8 @@ function resetTimeView() {
 
 <template>
   <div class="h-screen bg-[#f0f2f5]">
-    <div class="py-[10px]">
-      <TimeView @open="showPopup = true" class="mb-[10px] flex-shrink-0"/>
+    <div class="py-2.5">
+      <TimeView @open="showPopup = true" class="mb-2.5 shrink-0"/>
       <ClassView ref="classView" class="bg-white overflow-y-auto"/>
     </div>
     <t-popup v-model="showPopup" placement="bottom" destroy-on-close class="h-5/6" :z-index="1000"

@@ -4,6 +4,7 @@ import {useSelectionStore} from '../stores/selectionStore';
 import {loadClassroomData} from '../request';
 import type {CollapseValue} from "tdesign-mobile-vue";
 import {storeToRefs} from "pinia";
+import { initializeCampusFromNativeRPC } from "@/rpc.ts";
 
 const store = useSelectionStore();
 
@@ -48,6 +49,11 @@ watch(totalClassrooms, (newTotal: number) => {
 
 // 组件挂载时获取数据
 onMounted(async () => {
+  try {
+    await initializeCampusFromNativeRPC();
+  } catch (error) {
+    console.error('初始化校区失败，将使用默认校区:', error);
+  }
   if (Object.keys(store.classroomData).length === 0) {
     await loadClassroomData();
   }
@@ -92,8 +98,8 @@ const handleChange = (val: CollapseValue) => {
                   <h4 class="text-sm text-gray-600 mb-2 font-medium">{{ floor.name }}</h4>
                   <div class="flex flex-wrap gap-2">
                     <div v-for="room in floor.rooms" :key="room"
-                         class="w-[52px] h-[25px] flex border-1 border-blue-600 rounded-[10px] font-medium bg-white justify-center items-center">
-                      <div class="text-[13px] font-bold leading-[22px]">
+                         class="w-13 h-6.25 flex border border-blue-600 rounded-[10px] font-medium bg-white justify-center items-center">
+                      <div class="text-[13px] font-bold leading-5.5">
                         {{ room }}
                       </div>
                     </div>

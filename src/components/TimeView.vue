@@ -27,11 +27,11 @@ const emit = defineEmits(['open'])
 <template>
   <div class="bg-white px-5 py-3">
     <div class="mb-2">
-      <h1 class="text-lg leading-[26px] font-bold text-gray-900 mb-2">查询到 {{ classroomCount }} 间可用教室</h1>
+      <h1 class="text-lg leading-6.5 font-bold text-gray-900 mb-2">查询到 {{ classroomCount }} 间可用教室</h1>
     </div>
     <div class="flex justify-between">
       <div>
-        <div class="flex items-center text-sm leading-[22px] mb-1">
+        <div class="flex items-center text-sm leading-5.5 mb-1">
           <span class="text-neutral-600 w-14">校区：</span>
             <span v-for="campus in campuses" :key="campus"
                   class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
