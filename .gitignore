@@ -30,4 +30,5 @@ coverage
 *.tsbuildinfo
 data_process
 public
-
+/cos-upload
+/classroom*.sql

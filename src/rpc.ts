@@ -2,7 +2,8 @@ import NativeRPC from "@token-team/native-rpc-h5";
 import { useSelectionStore } from './stores/selectionStore.ts'
 
 const CAMPUS_STORAGE_KEY = 'classroom.campus'
-const DEFAULT_CAMPUS = '0202'
+const DEFAULT_CAMPUS = '南湖校区'
+const VALID_CAMPUSES = new Set(['南湖校区', '马房山校区'])
 
 type NativeStorageGetResponse = {
   value?: string
@@ -45,9 +46,9 @@ export async function initializeCampusFromNativeRPC(options?: {
   }
 
   const savedCampus = result.value?.trim() || ''
-  const campus = savedCampus || defaultCampus
+  const campus = VALID_CAMPUSES.has(savedCampus) ? savedCampus : defaultCampus
 
-  if (!savedCampus) {
+  if (campus !== savedCampus) {
     await saveCampusToNativeRPC(defaultCampus)
   }
 

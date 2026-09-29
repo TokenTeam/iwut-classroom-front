@@ -1,10 +1,11 @@
 /**
  * 将 empty_classrooms 的 INSERT 导出转为前端可用的按「校区 + 日历周（周一键）」合并的 JSON。
  *
- * 默认：第一教学周周一 = 2026-02-23（可通过 --term=YYYY-MM-DD 覆盖）。
- * 输出：{ [buildingCode]: { [dayOfWeek1-7]: { [classNum1-16]: string[] } } } }
+ * 默认：第一教学周周一 = 2026-09-07（可通过 --term=YYYY-MM-DD 覆盖）。
+ * 输出：{ [buildingName]: { [dayOfWeek1-7]: { [classNum1-13]: string[] } } } }
  *
- * 用法：node data_process/sql-to-json.mjs [--out=public] [--term=2026-02-23]
+ * 用法：node data_process/sql-to-json.mjs --input=classroom20260928.sql
+ *   [--out=cos-upload/classroom] [--term=2026-09-07]
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -14,9 +15,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 
 function parseArgs() {
-  const out = { dir: 'public', term: '2026-02-23' }
+  const out = {
+    input: 'classroom20260928.sql',
+    dir: 'cos-upload/classroom',
+    term: '2026-09-07'
+  }
   for (const a of process.argv.slice(2)) {
-    if (a.startsWith('--out=')) out.dir = a.slice(6)
+    if (a.startsWith('--input=')) out.input = a.slice(8)
+    else if (a.startsWith('--out=')) out.dir = a.slice(6)
     else if (a.startsWith('--term=')) out.term = a.slice(7)
   }
   return out
@@ -50,18 +56,27 @@ function slotCalendarDate(termStartMonday, week, dayOfWeek) {
 
 function roomsToArray(raw) {
   if (!raw || raw.trim() === '') return []
-  return raw.split(',').map((s) => s.trim()).filter(Boolean)
+  return raw
+    .split(',')
+    .map((room) => room.trim())
+    .filter(Boolean)
+    // 新导出中教室为“校园-楼栋-房间号”，前端只需要房间号。
+    .map((room) => room.slice(room.lastIndexOf('-') + 1).trim())
+    // 源数据中有少量“1508 1510”这样的多房间记录。
+    .flatMap((room) => room.split(/\s+/).filter(Boolean))
 }
 
 function main() {
-  const { dir: outRel, term } = parseArgs()
-  const sqlPath = path.join(__dirname, 'classroom.sql')
+  const { input: inputRel, dir: outRel, term } = parseArgs()
+  const sqlPath = path.resolve(ROOT, inputRel)
   const outRoot = path.resolve(ROOT, outRel)
   const termStart = parseTermStartMonday(term)
 
+  if (!fs.existsSync(sqlPath)) throw new Error(`SQL 文件不存在: ${sqlPath}`)
+
   const content = fs.readFileSync(sqlPath, 'utf8')
   const tupleRe =
-    /\((\d+),(\d+),'([^']*)','([^']*)',(\d+),'([^']*)'\)/g
+    /\((\d+),\s*(\d+),\s*'([^']*)',\s*'([^']*)',\s*(\d+),\s*'([^']*)'\)/g
 
   /** @type {Map<string, Record<string, Record<string, Record<string, string[]>>>>} */
   const buckets = new Map()
@@ -87,6 +102,9 @@ function main() {
     campusWeek[building][dow][classNum] = rooms
   }
 
+  if (rowCount === 0) throw new Error(`未从 SQL 中解析到数据: ${sqlPath}`)
+
+  fs.rmSync(outRoot, { recursive: true, force: true })
   for (const [fileKey, payload] of buckets) {
     const target = path.join(outRoot, ...fileKey.split('/')) + '.json'
     fs.mkdirSync(path.dirname(target), { recursive: true })
@@ -94,7 +112,7 @@ function main() {
   }
 
   console.log(
-    `sql-to-json: ${rowCount} 行 → ${buckets.size} 个文件，输出目录 ${outRoot}，学期周一 ${term}`
+    `sql-to-json: ${rowCount} 行 → ${buckets.size} 个文件，输出目录 ${outRoot}，第一教学周 ${term}`
   )
 }
 

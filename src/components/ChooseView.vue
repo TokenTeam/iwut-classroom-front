@@ -8,7 +8,7 @@ const store = useSelectionStore()
 
 const showCalendar = ref(false)
 const showTimeDropdown = ref(false)
-const selectedCampus = ref(store.selectedCampuses[0] || '0202')
+const selectedCampus = ref(store.selectedCampuses[0] || '南湖校区')
 
 const selectedDateDisplay = computed(() => store.selectedDateDisplay)
 const selectedTime = computed(() => store.selectedTime)
@@ -16,26 +16,21 @@ const selectedTime = computed(() => store.selectedTime)
 const timeOptions = [
   { value: '8:00 - 9:35', label: '8:00 - 9:35     1-2节' },
   { value: '9:55 - 12:20', label: '9:55 - 12:20   3-5节' },
-  { value: '12:25 - 13:50', label: '12:25 - 13:50  中课' },
   { value: '14:00 - 16:25', label: '14:00 - 16:25  6-8节' },
   { value: '16:45 - 18:20', label: '16:45 - 18:20 9-10节' },
-  { value: '18:20 - 18:55', label: '18:20 - 18:55  晚课' },
   { value: '19:00 - 21:25', label: '19:00 - 21:25 11-13节' }
 ]
 
 const campusOptions = [
-  { value: '0101', label: '东院校区' },
-  { value: '0102', label: '西院校区' },
-  { value: '0201', label: '鉴湖校区' },
-  { value: '0202', label: '南湖校区' },
-  { value: '0301', label: '余家头校区' }
+  { value: '南湖校区', label: '南湖校区' },
+  { value: '马房山校区', label: '马房山校区' }
 ]
 
 const resetFilters = async () => {
   store.updateSelectedDate(new Date())
   // store.updateSelectedTime('8:00 - 9:35') @note: 此处可以根据实际情况设置默认时间段 @lichx
   store.syncSelectedTimeWithCurrentTime()
-  selectedCampus.value = '0202'
+  selectedCampus.value = '南湖校区'
   store.updateSelectedCampuses([selectedCampus.value])
   await saveCampusToNativeRPC(selectedCampus.value)
 

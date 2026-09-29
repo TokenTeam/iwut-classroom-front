@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- 支持东院、西院、鉴湖、南湖和余家头 5 个校区
+- 支持南湖和马房山 2 个校区
 - 支持按日期与 7 个常用上课时段查询
 - 按教学楼和楼层展示空闲教室，并统计可用教室数量
 - 默认匹配当前或下一个上课时段
@@ -70,20 +70,20 @@ pnpm preview
 页面不会逐栋请求数据，而是按“校区 + 周”加载合并后的 JSON：
 
 ```text
-{VITE_OSS_URL}/{campusCode}/{mondayKey}.json
+{VITE_OSS_URL}/{campusName}/{mondayKey}.json
 ```
 
 例如，查询南湖校区某一周时，请求路径可能为：
 
 ```text
-/api/0202/2026.2.23.json
+/api/%E5%8D%97%E6%B9%96%E6%A0%A1%E5%8C%BA/2026.9.7.json
 ```
 
 数据结构如下：
 
 ```json
 {
-  "020204": {
+  "博学主楼": {
     "1": {
       "1": ["101", "102"],
       "2": ["101"]
@@ -92,16 +92,23 @@ pnpm preview
 }
 ```
 
-各层级依次为：教学楼代码、星期（`1` 至 `7`）、课节（`1` 至 `16`）和空闲教室列表。查询跨多个课节的时段时，前端会取每一节空闲教室列表的交集。
+各层级依次为：教学楼名、星期（`1` 至 `7`）、课节（`1` 至 `13`）和空闲教室列表。查询跨多个课节的时段时，前端会取每一节空闲教室列表的交集。
 
-如需从 `empty_classrooms` 的 SQL 导出生成数据，请将导出文件保存为 `data_process/classroom.sql`，然后运行：
+如需从 `empty_classrooms` 的 SQL 导出生成数据，运行：
 
 ```bash
-node data_process/sql-to-json.mjs --out=public --term=2026-02-23
+node data_process/sql-to-json.mjs \
+  --input=classroom20260928.sql \
+  --out=cos-upload/classroom \
+  --term=2026-09-07
 ```
 
-- `--out`：输出目录，默认为 `public`
-- `--term`：第一教学周的周一，默认为 `2026-02-23`
+- `--input`：SQL 导出文件，默认为 `classroom20260928.sql`
+- `--out`：输出目录，默认为 `cos-upload/classroom`
+- `--term`：第一教学周的周一，默认为 `2026-09-07`
+
+将 `cos-upload` 下的内容上传到 COS 桶根目录后，数据对象路径为
+`classroom/{campusName}/{mondayKey}.json`。
 
 ## 项目结构
 

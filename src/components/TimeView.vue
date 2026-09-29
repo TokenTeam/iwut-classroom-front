@@ -9,11 +9,8 @@ interface CampusOptions {
 }
 
 const campusOptions: CampusOptions = {
-  '0101': '东院校区',
-  '0102': '西院校区',
-  '0201': '鉴湖校区',
-  '0202': '南湖校区',
-  '0301': '余家头校区'
+  '南湖校区': '南湖校区',
+  '马房山校区': '马房山校区'
 }
 
 const classroomCount = computed(() => store.totalClassrooms || 0)

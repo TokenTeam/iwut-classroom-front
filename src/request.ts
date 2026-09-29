@@ -1,31 +1,5 @@
 import {useSelectionStore} from './stores/selectionStore';
 
-const buildingNameMap: Record<string, string> = {
-  '010102': '弘毅楼（附楼）',
-  '010103': '弘毅楼（主楼）',
-  '010106': '致远楼',
-  '010201': '东教学楼',
-  '020101': '爱特楼',
-  '020102': '北教一',
-  '020103': '北教二',
-  '020104': '北教三',
-  '020105': '学海楼',
-  '020201': '博学北楼',
-  '020202': '博学东楼',
-  '020203': '博学西楼',
-  '020204': '博学主楼',
-  '030102': '教学大楼',
-  '030201': '航海楼'
-}
-
-const campusBuildingMap: Record<string, string[]> = {
-  '0101': ['010102', '010103', '010106'],
-  '0102': ['010201'],
-  '0201': ['020101', '020102', '020103', '020104', '020105'],
-  '0202': ['020201', '020202', '020203', '020204'],
-  '0301': ['030102', '030201']
-}
-
 
 function getFirstDayOfWeek(date?: Date):string {
   const selectedDate = date || new Date();
@@ -51,11 +25,17 @@ type buildingClassroom = {
   count: number;
   floors: floorClassroom[];
 }
+
+function getFloorName(room: string): string {
+  if (/^\d{3,}$/.test(room)) return `${Number(room.slice(0, -2))}楼`;
+  return `${room.charAt(0)}楼`;
+}
+
 const baseURL = (import.meta.env.VITE_OSS_URL ?? '') as string;
 
 /** 合并后的 JSON：/{campus}/{周一键}.json，避免按楼栋拆分导致请求数过多 */
 function classroomBundleUrl(campus: string, mondayKey: string): string {
-  const path = `${campus}/${mondayKey}.json`;
+  const path = `${encodeURIComponent(campus)}/${mondayKey}.json`;
   if (baseURL === '/' || baseURL === '') return `/${path}`;
   const trimmed = baseURL.replace(/\/$/, '');
   return `${trimmed}/${path}`;
@@ -83,10 +63,9 @@ export async function loadClassroomData(): Promise<void> {
     console.error(`获取校区 ${campus} 课表数据失败:`, error);
   }
 
-  for (const building of campusBuildingMap[campus] || []) {
-    const data = bundle[building];
+  for (const [building, data] of Object.entries(bundle)) {
     if (!data || !data[dow]) {
-      ans.set(buildingNameMap[building] || building, {
+      ans.set(building, {
         code: building,
         count: 0,
         floors: []
@@ -106,8 +85,7 @@ export async function loadClassroomData(): Promise<void> {
     } as buildingClassroom;
     const floors = new Map<string, string[]>();
     for (const room of Array.from(st).sort()) {
-      const floorNumber = room.charAt(0);
-      const floorName = `${floorNumber}楼`;
+      const floorName = getFloorName(room);
       if (!floors.has(floorName)) {
         floors.set(floorName, []);
       }
@@ -116,9 +94,9 @@ export async function loadClassroomData(): Promise<void> {
     for (const [name, rooms] of floors) {
       tempAns.floors.push({ name, rooms });
     }
-    tempAns.floors.sort((a, b) => a.name.localeCompare(b.name));
-    tempAns.floors.forEach((x) => x.rooms.sort());
-    ans.set(buildingNameMap[building] || building, tempAns);
+    tempAns.floors.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', { numeric: true }));
+    tempAns.floors.forEach((x) => x.rooms.sort((a, b) => a.localeCompare(b, 'zh-CN', { numeric: true })));
+    ans.set(building, tempAns);
     count += st.size;
   }
 

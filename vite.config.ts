@@ -22,7 +22,7 @@ export default defineConfig({
       '/api': {
         target: 'https://bucket.tokenteam.net',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '/iwut/classroom/')
+        rewrite: (path) => path.replace(/^\/api/, '/classroom/')
       }
     }
   }

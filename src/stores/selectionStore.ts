@@ -14,11 +14,9 @@ interface UpdateSelectionsPayload {
 const timeMap: Record<string, { start: number; end: number }> = {
   '8:00 - 9:35': { start: 1, end: 2 },
   '9:55 - 12:20': { start: 3, end: 5 },
-  '12:25 - 13:50': { start: 6, end: 7 },
-  '14:00 - 16:25': { start: 8, end: 10 },
-  '16:45 - 18:20': { start: 11, end: 12 },
-  '18:20 - 18:55': { start: 13, end: 13 },
-  '19:00 - 21:25': { start: 14, end: 16 }
+  '14:00 - 16:25': { start: 6, end: 8 },
+  '16:45 - 18:20': { start: 9, end: 10 },
+  '19:00 - 21:25': { start: 11, end: 13 }
 }
 
 const getCurrentTimeSlotKey = (date: Date = new Date()): string => {
@@ -65,7 +63,7 @@ const formatDateDisplay = (date: Date): string => {
 }
 
 export const useSelectionStore = defineStore('selections', () => {
-  const campus = ref<string>('0202')
+  const campus = ref<string>('南湖校区')
   const time = ref<number>(1) // 改为 number 类型
   const section = ref<number>(2) // 改为 number 类型
   const availableBuildings = ref<string[]>([])
@@ -75,7 +73,7 @@ export const useSelectionStore = defineStore('selections', () => {
   const selectedDate = ref<string>(new Date().toISOString().split('T')[0])
   const selectedDateDisplay = ref<string>(formatDateDisplay(new Date()))
   const selectedTime = ref<string>(getCurrentTimeSlotKey())
-  const selectedCampuses = ref<string[]>(['0202'])
+  const selectedCampuses = ref<string[]>(['南湖校区'])
   const selectedBuildings = ref<string[]>(['博学主楼'])
   const totalClassrooms = ref<number>(0)
 
@@ -113,7 +111,7 @@ export const useSelectionStore = defineStore('selections', () => {
 
   const updateSelectedCampuses = (campuses: string[]): void => {
     selectedCampuses.value = campuses
-    campus.value = campuses[0] || '0202'
+    campus.value = campuses[0] || '南湖校区'
   }
 
   const updateSelectedBuildings = (buildings: string[]): void => { selectedBuildings.value = buildings }
@@ -123,7 +121,7 @@ export const useSelectionStore = defineStore('selections', () => {
   const setLoading = (loading: boolean): void => { isLoading.value = loading }
 
   const reset = (): void => {
-    campus.value = '0202'
+    campus.value = '南湖校区'
     availableBuildings.value = []
     classroomData.value = {}
     isLoading.value = false
@@ -131,7 +129,7 @@ export const useSelectionStore = defineStore('selections', () => {
     const today = new Date()
     selectedDate.value = today.toISOString().split('T')[0]
     selectedDateDisplay.value = formatDateDisplay(today)
-    selectedCampuses.value = ['0202']
+    selectedCampuses.value = ['南湖校区']
     selectedBuildings.value = ['博学主楼']
     totalClassrooms.value = 0
 
