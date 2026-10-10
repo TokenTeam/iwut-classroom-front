@@ -23,9 +23,9 @@ const timeOptions = [
 
 const campusOptions = [
   { value: '南湖校区', label: '南湖校区' },
-  { value: '东院', label: '东院' },
-  { value: '西院', label: '西院' },
-  { value: '鉴湖', label: '鉴湖' },
+  { value: '东院校区', label: '东院校区' },
+  { value: '西院校区', label: '西院校区' },
+  { value: '鉴湖校区', label: '鉴湖校区' },
   { value: '余家头校区', label: '余家头校区' },
   { value: '军山校区', label: '军山校区' }
 ]

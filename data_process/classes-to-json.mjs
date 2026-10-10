@@ -1,5 +1,5 @@
 /**
- * 将逐教室课程表转换为前端使用的 v2 周占用位图。
+ * 将逐教室课程表转换为前端使用的 v3 周占用位图。
  *
  * 输出：{out}/{campus}/{mondayKey}.json
  * 每个教室对应 7 个整数；整数第 N 位为 1，表示当天第 N+1 节被占用。
@@ -7,7 +7,7 @@
  * 用法：
  * node data_process/classes-to-json.mjs \
  *   --input=/path/to/classes.tar \
- *   --out=cos-upload/classroom/v2/2026-fall \
+ *   --out=cos-upload/classroom/v3/2026-fall \
  *   --term=2026-09-07
  */
 import crypto from 'node:crypto'
@@ -26,18 +26,18 @@ const TARGET_CAMPUS_BY_LOCATION = new Map([
   ['南院/博学东楼', '南湖校区'],
   ['南院/博学西楼', '南湖校区'],
   ['南院/博学主楼', '南湖校区'],
-  ['东院/弘毅楼（主楼）', '东院'],
-  ['东院/弘毅楼（附楼）', '东院'],
-  ['东院/致远楼', '东院'],
-  ['西院/东教学楼', '西院'],
-  ['西院/南配楼', '西院'],
-  ['西院/工大楼', '西院'],
-  ['马区西/工大楼', '西院'],
-  ['北院/爱特楼', '鉴湖'],
-  ['北院/北院第一教学楼', '鉴湖'],
-  ['北院/北院第二教学楼', '鉴湖'],
-  ['北院/北院第三教学楼', '鉴湖'],
-  ['北院/学海楼', '鉴湖'],
+  ['东院/弘毅楼（主楼）', '东院校区'],
+  ['东院/弘毅楼（附楼）', '东院校区'],
+  ['东院/致远楼', '东院校区'],
+  ['西院/东教学楼', '西院校区'],
+  ['西院/南配楼', '西院校区'],
+  ['西院/工大楼', '西院校区'],
+  ['马区西/工大楼', '西院校区'],
+  ['北院/爱特楼', '鉴湖校区'],
+  ['北院/北院第一教学楼', '鉴湖校区'],
+  ['北院/北院第二教学楼', '鉴湖校区'],
+  ['北院/北院第三教学楼', '鉴湖校区'],
+  ['北院/学海楼', '鉴湖校区'],
   ['余区/东配楼', '余家头校区'],
   ['余区/西配楼', '余家头校区'],
   ['余区/航海楼', '余家头校区'],
@@ -52,7 +52,7 @@ const TARGET_CAMPUS_BY_AREA = new Map([
 function parseArgs() {
   const options = {
     input: '',
-    out: 'cos-upload/classroom/v2/2026-fall',
+    out: 'cos-upload/classroom/v3/2026-fall',
     term: '2026-09-07'
   }
 
@@ -284,7 +284,7 @@ function main() {
 
         const monday = addDays(termStart, (week - 1) * 7)
         const payload = {
-          schemaVersion: 2,
+          schemaVersion: 3,
           campus,
           week,
           monday: formatMonday(monday),
@@ -305,7 +305,7 @@ function main() {
     }
 
     const manifest = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       termStart: options.term,
       termEnd: formatIsoDate(addDays(termStart, maxWeek * 7 - 1)),
       weekCount: maxWeek,

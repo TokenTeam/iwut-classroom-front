@@ -3,7 +3,12 @@ import { useSelectionStore } from './stores/selectionStore.ts'
 
 const CAMPUS_STORAGE_KEY = 'classroom.campus'
 const DEFAULT_CAMPUS = '南湖校区'
-const VALID_CAMPUSES = new Set(['南湖校区', '东院', '西院', '鉴湖', '余家头校区', '军山校区'])
+const VALID_CAMPUSES = new Set(['南湖校区', '东院校区', '西院校区', '鉴湖校区', '余家头校区', '军山校区'])
+const LEGACY_CAMPUSES = new Map([
+  ['东院', '东院校区'],
+  ['西院', '西院校区'],
+  ['鉴湖', '鉴湖校区']
+])
 const NATIVE_RPC_TIMEOUT_MS = 1500
 
 type NativeStorageGetResponse = {
@@ -87,10 +92,11 @@ export async function initializeCampusFromNativeRPC(options?: {
     }
   }
 
-  const campus = VALID_CAMPUSES.has(savedCampus) ? savedCampus : defaultCampus
+  const migratedCampus = LEGACY_CAMPUSES.get(savedCampus) ?? savedCampus
+  const campus = VALID_CAMPUSES.has(migratedCampus) ? migratedCampus : defaultCampus
 
   if (campus !== savedCampus) {
-    await saveCampusToNativeRPC(defaultCampus)
+    await saveCampusToNativeRPC(campus)
   }
 
   store.updateSelectedCampuses([campus])

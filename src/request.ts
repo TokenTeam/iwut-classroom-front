@@ -27,7 +27,7 @@ type BuildingClassroom = {
 }
 
 type OccupancyBundle = {
-  schemaVersion: 2
+  schemaVersion: 3
   campus: string
   week: number
   monday: string
@@ -49,10 +49,10 @@ function getFloorName(room: string): string {
 }
 
 const baseURL = (import.meta.env.VITE_OSS_URL ?? '') as string
-const datasetPath = (import.meta.env.VITE_CLASSROOM_DATASET ?? 'v2/2026-fall')
+const datasetPath = (import.meta.env.VITE_CLASSROOM_DATASET ?? 'v3/2026-fall')
   .replace(/^\/+|\/+$/g, '')
 
-/** v2 周占用位图：/{dataset}/{campus}/{周一键}.json */
+/** v3 周占用位图：/{dataset}/{campus}/{周一键}.json */
 function classroomBundleUrl(campus: string, mondayKey: string): string {
   const dataPath = `${datasetPath}/${encodeURIComponent(campus)}/${mondayKey}.json`
   if (baseURL === '/' || baseURL === '') return `/${dataPath}`
@@ -77,7 +77,7 @@ export async function loadClassroomData(): Promise<void> {
     const response = await fetch(url)
     if (!response.ok) throw new Error('网络请求失败，url: ' + url)
     bundle = await response.json() as OccupancyBundle
-    if (bundle.schemaVersion !== 2 || !bundle.buildings) {
+    if (bundle.schemaVersion !== 3 || !bundle.buildings) {
       throw new Error('不支持的教室数据格式，url: ' + url)
     }
   } catch (error) {

@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- 支持南湖、东院、西院、鉴湖、余家头和军山 6 个查询区域
+- 支持南湖、东院、鉴湖、西院、余家头和军山 6 个校区
 - 支持按日期与 7 个常用上课时段查询
 - 按教学楼和楼层展示空闲教室，并统计可用教室数量
 - 默认匹配当前或下一个上课时段
@@ -40,7 +40,7 @@ pnpm dev
 
 ```dotenv
 VITE_OSS_URL="/api"
-VITE_CLASSROOM_DATASET="v2/2026-fall"
+VITE_CLASSROOM_DATASET="v3/2026-fall"
 ```
 
 开发环境下，Vite 会将 `/api` 请求代理至远程教室数据目录。也可以将 `VITE_OSS_URL` 配置为自建数据服务或对象存储的完整地址；地址末尾的 `/` 可省略。
@@ -77,14 +77,14 @@ pnpm preview
 例如，查询南湖校区某一周时，请求路径可能为：
 
 ```text
-/api/v2/2026-fall/%E5%8D%97%E6%B9%96%E6%A0%A1%E5%8C%BA/2026.9.7.json
+/api/v3/2026-fall/%E5%8D%97%E6%B9%96%E6%A0%A1%E5%8C%BA/2026.9.7.json
 ```
 
 数据结构如下：
 
 ```json
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "campus": "南湖校区",
   "week": 1,
   "monday": "2026.9.7",
@@ -105,27 +105,27 @@ pnpm preview
 ```bash
 node data_process/classes-to-json.mjs \
   --input=/path/to/classes.tar \
-  --out=cos-upload/classroom/v2/2026-fall \
+  --out=cos-upload/classroom/v3/2026-fall \
   --term=2026-09-07
 ```
 
 - `--input`：逐教室 JSON 所在目录或包含这些文件的 tar 包，必须指定
-- `--out`：输出目录，默认为 `cos-upload/classroom/v2/2026-fall`
+- `--out`：输出目录，默认为 `cos-upload/classroom/v3/2026-fall`
 - `--term`：第一教学周的周一，默认为 `2026-09-07`
 
 转换器使用楼栋白名单，只生成以下查询区域：
 
 - 南湖校区：博学北楼、博学东楼、博学西楼、博学主楼
-- 东院：弘毅楼（主楼）、弘毅楼（附楼）、致远楼
-- 西院：东教学楼、南配楼、工大楼
-- 鉴湖：爱特楼、北院第一教学楼、北院第二教学楼、北院第三教学楼、学海楼
+- 东院校区：弘毅楼（主楼）、弘毅楼（附楼）、致远楼
+- 西院校区：东教学楼、南配楼、工大楼
+- 鉴湖校区：爱特楼、北院第一教学楼、北院第二教学楼、北院第三教学楼、学海楼
 - 余家头校区：东配楼、西配楼、航海楼、余区教学大楼
 - 军山校区：保留源数据中的全部楼栋和场地
 
 名称包含“不要教室”以及“校外教学”的占位文件也会被排除；课程周次为空的“系统提示”按整个有效学期占用处理。
 
 将 `cos-upload` 下的内容上传到 COS 桶根目录后，数据对象路径为
-`classroom/v2/2026-fall/{campusName}/{mondayKey}.json`。旧版对象无需覆盖，可以与 v2 并存。
+`classroom/v3/2026-fall/{campusName}/{mondayKey}.json`。v3 使用新的对象路径绕过旧版缓存；旧版对象无需覆盖，可以与 v3 并存。
 
 ## 项目结构
 
