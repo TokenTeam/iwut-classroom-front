@@ -3,7 +3,7 @@ import { useSelectionStore } from './stores/selectionStore.ts'
 
 const CAMPUS_STORAGE_KEY = 'classroom.campus'
 const DEFAULT_CAMPUS = '南湖校区'
-const VALID_CAMPUSES = new Set(['南湖校区', '马房山校区', '余家头校区', '军山校区'])
+const VALID_CAMPUSES = new Set(['南湖校区', '东院', '西院', '鉴湖', '余家头校区', '军山校区'])
 const NATIVE_RPC_TIMEOUT_MS = 1500
 
 type NativeStorageGetResponse = {

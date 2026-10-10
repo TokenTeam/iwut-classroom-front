@@ -21,17 +21,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const MAX_SECTION = 16
 
-const CAMPUS_BY_AREA = new Map([
-  ['南院', '南湖校区'],
-  ['南湖北', '南湖校区'],
-  ['南湖南', '南湖校区'],
-  ['东院', '马房山校区'],
-  ['西院', '马房山校区'],
-  ['北院', '马房山校区'],
-  ['马区东', '马房山校区'],
-  ['马区西', '马房山校区'],
-  ['余区', '余家头校区'],
-  ['余区北', '余家头校区'],
+const TARGET_CAMPUS_BY_LOCATION = new Map([
+  ['南院/博学北楼', '南湖校区'],
+  ['南院/博学东楼', '南湖校区'],
+  ['南院/博学西楼', '南湖校区'],
+  ['南院/博学主楼', '南湖校区'],
+  ['东院/弘毅楼（主楼）', '东院'],
+  ['东院/弘毅楼（附楼）', '东院'],
+  ['东院/致远楼', '东院'],
+  ['西院/东教学楼', '西院'],
+  ['西院/南配楼', '西院'],
+  ['西院/工大楼', '西院'],
+  ['马区西/工大楼', '西院'],
+  ['北院/爱特楼', '鉴湖'],
+  ['北院/北院第一教学楼', '鉴湖'],
+  ['北院/北院第二教学楼', '鉴湖'],
+  ['北院/北院第三教学楼', '鉴湖'],
+  ['北院/学海楼', '鉴湖'],
+  ['余区/东配楼', '余家头校区'],
+  ['余区/西配楼', '余家头校区'],
+  ['余区/航海楼', '余家头校区'],
+  ['余区/余区教学大楼', '余家头校区']
+])
+
+const TARGET_CAMPUS_BY_AREA = new Map([
   ['军山', '军山校区'],
   ['军山校区', '军山校区']
 ])
@@ -120,22 +133,25 @@ function parseRoomLocation(name) {
   const firstSeparator = name.indexOf('-')
   if (firstSeparator < 1) return null
   const area = name.slice(0, firstSeparator)
-  const campus = CAMPUS_BY_AREA.get(area)
-  if (!campus) throw new Error(`无法识别区域: ${name}`)
+  const areaCampus = TARGET_CAMPUS_BY_AREA.get(area)
 
   const location = name.slice(firstSeparator + 1)
   const secondSeparator = location.indexOf('-')
   if (secondSeparator >= 1) {
+    const building = location.slice(0, secondSeparator)
+    const campus = areaCampus ?? TARGET_CAMPUS_BY_LOCATION.get(`${area}/${building}`)
+    if (!campus) return null
     return {
       campus,
-      building: location.slice(0, secondSeparator),
+      building,
       room: location.slice(secondSeparator + 1)
     }
   }
 
   const venue = location.match(/^(.+?)(\d+)$/u)
   if (!venue) throw new Error(`无法拆分楼栋和教室: ${name}`)
-  return { campus, building: venue[1], room: venue[2] }
+  const campus = areaCampus ?? TARGET_CAMPUS_BY_LOCATION.get(`${area}/${venue[1]}`)
+  return campus ? { campus, building: venue[1], room: venue[2] } : null
 }
 
 function parseExplicitWeeks(value) {

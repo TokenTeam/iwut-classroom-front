@@ -10,7 +10,9 @@ interface CampusOptions {
 
 const campusOptions: CampusOptions = {
   '南湖校区': '南湖校区',
-  '马房山校区': '马房山校区',
+  '东院': '东院',
+  '西院': '西院',
+  '鉴湖': '鉴湖',
   '余家头校区': '余家头校区',
   '军山校区': '军山校区'
 }

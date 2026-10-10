@@ -98,8 +98,8 @@ const handleChange = (val: CollapseValue) => {
                   <h4 class="text-sm text-gray-600 mb-2 font-medium">{{ floor.name }}</h4>
                   <div class="flex flex-wrap gap-2">
                     <div v-for="room in floor.rooms" :key="room"
-                         class="w-13 h-6.25 flex border border-blue-600 rounded-[10px] font-medium bg-white justify-center items-center">
-                      <div class="text-[13px] font-bold leading-5.5">
+                         class="min-w-13 h-6.25 px-2 shrink-0 flex border border-blue-600 rounded-[10px] font-medium bg-white justify-center items-center">
+                      <div class="text-[13px] font-bold leading-5.5 whitespace-nowrap">
                         {{ room }}
                       </div>
                     </div>
