@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- 支持南湖和马房山 2 个校区
+- 支持南湖、马房山、余家头和军山 4 个校区
 - 支持按日期与 7 个常用上课时段查询
 - 按教学楼和楼层展示空闲教室，并统计可用教室数量
 - 默认匹配当前或下一个上课时段
@@ -40,6 +40,7 @@ pnpm dev
 
 ```dotenv
 VITE_OSS_URL="/api"
+VITE_CLASSROOM_DATASET="v2/2026-fall"
 ```
 
 开发环境下，Vite 会将 `/api` 请求代理至远程教室数据目录。也可以将 `VITE_OSS_URL` 配置为自建数据服务或对象存储的完整地址；地址末尾的 `/` 可省略。
@@ -67,48 +68,55 @@ pnpm preview
 
 ## 数据说明
 
-页面不会逐栋请求数据，而是按“校区 + 周”加载合并后的 JSON：
+页面不会逐栋请求数据，而是按“数据版本 + 校区 + 周”加载合并后的 JSON：
 
 ```text
-{VITE_OSS_URL}/{campusName}/{mondayKey}.json
+{VITE_OSS_URL}/{VITE_CLASSROOM_DATASET}/{campusName}/{mondayKey}.json
 ```
 
 例如，查询南湖校区某一周时，请求路径可能为：
 
 ```text
-/api/%E5%8D%97%E6%B9%96%E6%A0%A1%E5%8C%BA/2026.9.7.json
+/api/v2/2026-fall/%E5%8D%97%E6%B9%96%E6%A0%A1%E5%8C%BA/2026.9.7.json
 ```
 
 数据结构如下：
 
 ```json
 {
-  "博学主楼": {
-    "1": {
-      "1": ["101", "102"],
-      "2": ["101"]
+  "schemaVersion": 2,
+  "campus": "南湖校区",
+  "week": 1,
+  "monday": "2026.9.7",
+  "buildings": {
+    "博学主楼": {
+      "101": [3, 0, 28, 0, 0, 0, 0]
     }
   }
 }
 ```
 
-各层级依次为：教学楼名、星期（`1` 至 `7`）、课节（`1` 至 `13`）和空闲教室列表。查询跨多个课节的时段时，前端会取每一节空闲教室列表的交集。
+`buildings` 下依次为教学楼名和教室名。每个教室保存长度为 7 的数组，对应周一至周日；每天的整数是课节占用位图，第 N 位为 1 表示第 N+1 节被占用。前端将所选时段转换为位图，一次按位与运算即可判断教室是否全程空闲。
 
-如需从 `empty_classrooms` 的 SQL 导出生成数据，运行：
+根目录的 `manifest.json` 记录教学周范围、校区、楼栋和教室数量。当前数据覆盖 2026-09-07 至 2027-01-17，共 19 个教学周。
+
+如需从逐教室课程表压缩包生成数据，运行：
 
 ```bash
-node data_process/sql-to-json.mjs \
-  --input=classroom20260928.sql \
-  --out=cos-upload/classroom \
+node data_process/classes-to-json.mjs \
+  --input=/path/to/classes.tar \
+  --out=cos-upload/classroom/v2/2026-fall \
   --term=2026-09-07
 ```
 
-- `--input`：SQL 导出文件，默认为 `classroom20260928.sql`
-- `--out`：输出目录，默认为 `cos-upload/classroom`
+- `--input`：逐教室 JSON 所在目录或包含这些文件的 tar 包，必须指定
+- `--out`：输出目录，默认为 `cos-upload/classroom/v2/2026-fall`
 - `--term`：第一教学周的周一，默认为 `2026-09-07`
 
+转换器会把东院、西院、北院归入马房山校区，南院及南湖体育区域归入南湖校区，余区归入余家头校区，并单独保留军山校区。名称包含“不要教室”以及“校外教学”的占位文件会被排除；课程周次为空的“系统提示”按整个有效学期占用处理。
+
 将 `cos-upload` 下的内容上传到 COS 桶根目录后，数据对象路径为
-`classroom/{campusName}/{mondayKey}.json`。
+`classroom/v2/2026-fall/{campusName}/{mondayKey}.json`。旧版对象无需覆盖，可以与 v2 并存。
 
 ## 项目结构
 
@@ -136,14 +144,14 @@ node data_process/sql-to-json.mjs \
 ## 核心流程
 
 1. 应用启动后读取 NativeRPC 中保存的校区；读取失败时沿用默认的南湖校区。
-2. 根据所选日期计算该周的周一，并请求对应校区的周数据。
-3. 根据星期和课节筛选数据；跨课节查询会计算教室集合的交集。
+2. 根据所选日期计算该周的周一，并请求对应数据版本及校区的周数据。
+3. 根据星期和课节生成查询位图，与每间教室的占用位图比较。
 4. 查询结果按教学楼、楼层分组展示，同时更新总教室数。
 
 ## 开发说明
 
 - 路径别名 `@` 指向 `src/`。
-- 新增校区或教学楼时，需要同步维护 `src/request.ts` 中的映射。
+- 新增校区时，需要同步维护筛选选项和 NativeRPC 的有效校区列表；教学楼和教室从数据文件动态读取。
 - 新增或调整查询时段时，需要同步修改 `src/components/ChooseView.vue` 和 `src/stores/selectionStore.ts` 中的时段配置。
 - NativeRPC 使用的持久化键为 `classroom.campus`。
 

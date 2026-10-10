@@ -10,7 +10,9 @@ interface CampusOptions {
 
 const campusOptions: CampusOptions = {
   '南湖校区': '南湖校区',
-  '马房山校区': '马房山校区'
+  '马房山校区': '马房山校区',
+  '余家头校区': '余家头校区',
+  '军山校区': '军山校区'
 }
 
 const classroomCount = computed(() => store.totalClassrooms || 0)

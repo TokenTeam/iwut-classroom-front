@@ -23,7 +23,9 @@ const timeOptions = [
 
 const campusOptions = [
   { value: '南湖校区', label: '南湖校区' },
-  { value: '马房山校区', label: '马房山校区' }
+  { value: '马房山校区', label: '马房山校区' },
+  { value: '余家头校区', label: '余家头校区' },
+  { value: '军山校区', label: '军山校区' }
 ]
 
 const resetFilters = async () => {
@@ -109,7 +111,7 @@ function close() {
       <hr class="border-neutral-200" />
       <div class="my-4">
         <div class="text-sm leading-5.5 font-medium text-gray-900 mb-2">校区</div>
-        <div class="grid grid-cols-3 grid-rows-2 gap-3">
+        <div class="grid grid-cols-2 gap-3">
           <t-check-tag v-for="campus in campusOptions" :key="campus.value" :checked="campus.value === selectedCampus" shape="round" variant="light-outline"
                        size="large" class="w-full min-h-10 flex justify-center items-center" @click="handleCampusSelect(campus.value)">
             {{ campus.label }}
