@@ -16,8 +16,10 @@ const selectedTime = computed(() => store.selectedTime)
 const timeOptions = [
   { value: '8:00 - 9:35', label: '8:00 - 9:35     1-2节' },
   { value: '9:55 - 12:20', label: '9:55 - 12:20   3-5节' },
+  { value: '12:25 - 13:50', label: '12:25 - 13:50  中课' },
   { value: '14:00 - 16:25', label: '14:00 - 16:25  6-8节' },
   { value: '16:45 - 18:20', label: '16:45 - 18:20 9-10节' },
+  { value: '18:20 - 18:55', label: '18:20 - 18:55  晚课' },
   { value: '19:00 - 21:25', label: '19:00 - 21:25 11-13节' }
 ]
 
